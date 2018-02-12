@@ -9,7 +9,7 @@ ing community. We evaluate our results using the Receiver Operating Characterist
 
 The paper can be found in the `report.pdf` file. We provide the `python` code and all the data sets that have been used in this analysis, for anyone that would like to reproduce/improve/study the results.
 
-The data sets can be found as text files in the `datasets` folder. Each data set has been processed using the NetworkName_calculate_metrics.py script in the `code` folder. For each data set, eight metrics are calculated which are then used as features in a HDDT and C4.5 tree. Specifically, the following metrics are calculated using python's `linkpred` library:    
+The data sets can be found as text files in the `datasets` folder. Each data set has been processed using the `NetworkName_calculate_metrics.py` script in the `code` folder. For each data set, eight metrics are calculated which are then used as features in a HDDT and C4.5 tree. Specifically, the following metrics are calculated using python's `linkpred` library:    
 * *Adamic Adar*     
 * *Common Neighbors*    
 * *Rooted Page Rank*     
@@ -19,5 +19,5 @@ The data sets can be found as text files in the `datasets` folder. Each data set
 * *Resource Allocation*     
 * *Assocation Strength*.     
 
-After calculation, each of these metrics can be loaded using the NetworkName_load_metrics.py script. The HDDT and C4.5 trees are implemented in WEKA. Due to the huge imbalance in some of these data sets, we have under sampled the data to an imbalance of 1:10, and saved them to .arff files. These files can be loaded immediately to WEKA in order to reproduce the results found in the paper. A version of WEKA that contains an implementation of HDDT can be found [here](https://www3.nd.edu/~dial/software/). The WEKA configuration files can be found in the `weka_config_files` folder.
+After calculation, each of these metrics can be loaded using the `NetworkName_load_metrics.py` script. The HDDT and C4.5 trees are implemented in WEKA. Due to the huge imbalance in some of these data sets, we have under sampled the data to an imbalance of 1:10, and saved them to .arff files. These files can be loaded immediately to WEKA in order to reproduce the results found in the paper. A version of WEKA that contains an implementation of HDDT can be found [here](https://www3.nd.edu/~dial/software/). The WEKA configuration files can be found in the `weka_config_files` folder.
   
