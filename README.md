@@ -1,4 +1,4 @@
-This is a project in the framework of the MSc course *Social Network Analysis for Computer Scientists*, of Leiden University.
+This is a project in the framework of the MSc course *Social Network Analysis for Computer Scientists* of Leiden University.
 
 ### Abstract
 
