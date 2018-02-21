@@ -129,27 +129,5 @@ for u, v in jaccard_results.keys():
 # Also save the labels
 with open('DiggNetwork/labels_DiggNetwork.pkl', 'wb') as y:
     pickle.dump(labels, y)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
+    
