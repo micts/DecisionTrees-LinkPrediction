@@ -5,30 +5,14 @@ import collections
 import pickle
 import os
 
-"""
-The linkpred module makes it (relatively) easy to calculate the metrics we want, without explicitly creating 
-the train and test sets. For example, the function 
+# load the data
+data = np.loadtxt('./datasets//DiggNetwork//DiggNetwork.txt', dtype = int)
 
-linkpred.predictors.AdamicAdar(trainPeriodGraph, excluded = trainPeriodGraph.edges())
+data = data[np.where(data[:, 0] != data[:, 1])] # remove self loops
+data = data[:,[0, 1, 3]] 
+data = data[data[:, 2].argsort()] # sort by timestamp
 
-will calculate the AdamicAdar metric for the 2-size neighborhood (all the combinations of nodes that 
-are 2 steps away from each other) of the specified "training graph", by excluding all the pairs that
-belong to the "training graph". The "training graph" is the graph of the "training period" we have
-specified.
-
-The disadvantage is that linkpred is relatively slow for networks with a lot of edges. The good thing is
-that when we calculate a measure, we can then save it into a file and load it when needed.
-"""
-
-
-data = np.loadtxt('Evaluation/Digg/Dataset//DiggNetwork.txt',dtype = int)
-
-data = data[np.where(data[:,0] != data[:,1])] # remove self loops
-data = data[:,[0,1,3]]
-data = data[data[:,2].argsort()] # sort by timestamp
-
-# The data set is sorted by timestamp. We extract rows from 1 to 90000 to indicate the train period.
-# The rest indicate the test period
+# Train period from rows 0:51721. Rest is the test period.
 trainPeriod = data[:51721,:]  
 testPeriod = data[51721:,:]
 
@@ -36,46 +20,51 @@ testPeriod = data[51721:,:]
 trainPeriodGraph = nx.Graph(trainPeriod[:,[0,1]].tolist())
 testPeriodGraph = nx.Graph(testPeriod[:,[0,1]].tolist())
 
-
 """
-Calculate metrics for each node and its 2-size neighborhood. The functions exclude the nodes
+Calculate metrics for each node and its 2-size neighborhood. The functions exclude nodes
 that belong in the train period ('excluded' argument).
 
-Some of those measures will be very slow for large networks, due to nested for loops.
+Some of those measures will be very slow to compute due to the size of the network.
 """
 
 # Adamic Adar
-adamicAdar = linkpred.predictors.AdamicAdar(trainPeriodGraph, excluded = trainPeriodGraph.edges())
+adamicAdar = linkpred.predictors.AdamicAdar(trainPeriodGraph, 
+                                            excluded = trainPeriodGraph.edges())
 adamicAdar_results = adamicAdar.predict()
 
 # commonNeighbors measure
-commonNeighbors = linkpred.predictors.CommonNeighbours(trainPeriodGraph, excluded = trainPeriodGraph.edges())
+commonNeighbors = linkpred.predictors.CommonNeighbours(trainPeriodGraph, 
+                                                       excluded = trainPeriodGraph.edges())
 commonNeighbors_results = commonNeighbors.predict(alpha = 0)
 
 # Rooted PageRank
-rootedPageRank = linkpred.predictors.RootedPageRank(trainPeriodGraph, excluded = trainPeriodGraph.edges())
+rootedPageRank = linkpred.predictors.RootedPageRank(trainPeriodGraph, 
+                                                    excluded = trainPeriodGraph.edges())
 rootedPageRank_results = rootedPageRank.predict(weight = None, k = 2)
 
 # Jaccard coefficient
-jaccard = linkpred.predictors.Jaccard(trainPeriodGraph, excluded = trainPeriodGraph.edges())
+jaccard = linkpred.predictors.Jaccard(trainPeriodGraph, 
+                                      excluded = trainPeriodGraph.edges())
 jaccard_results = jaccard.predict()
 
 # NMeasure
-nmeasure = linkpred.predictors.NMeasure(
-    trainPeriodGraph, excluded=trainPeriodGraph.edges())
+nmeasure = linkpred.predictors.NMeasure(trainPeriodGraph, 
+                                        excluded=trainPeriodGraph.edges())
 nmeasure_results = nmeasure.predict()
 
 # Min Overlap
-minOverlap = linkpred.predictors.MinOverlap(
-    trainPeriodGraph, excluded=trainPeriodGraph.edges())
+minOverlap = linkpred.predictors.MinOverlap(trainPeriodGraph, 
+                                            excluded=trainPeriodGraph.edges())
 minOverlap_results = minOverlap.predict()
 
 # Resource Allocation
-resAllocation = linkpred.predictors.ResourceAllocation(trainPeriodGraph, excluded = trainPeriodGraph.edges())
+resAllocation = linkpred.predictors.ResourceAllocation(trainPeriodGraph, 
+                                                       excluded = trainPeriodGraph.edges())
 resAllocation_results = resAllocation.predict()
 
 # Association Strength
-assocStrength = linkpred.predictors.AssociationStrength(trainPeriodGraph, excluded = trainPeriodGraph.edges())
+assocStrength = linkpred.predictors.AssociationStrength(trainPeriodGraph, 
+                                                        excluded = trainPeriodGraph.edges())
 assocStrength_results = assocStrength.predict()
 
 # converting the metrics into lists. We will feed them into pandas data frames later
@@ -88,35 +77,35 @@ assocStrengthList = list(assocStrength_results.values())
 nmeasureList = list(nmeasure_results.values())
 minOverlapList = list(minOverlap_results.values())
 
-"""
-Save the metrics.
-"""
+# save the metrics
+if not os.path.isdir('Metrics'):
+    os.mkdir('Metrics')
 
-if not os.path.isdir('DiggNetwork'):
-    os.mkdir('DiggNetwork')
+if not os.path.isdir('Metrics/DiggNetwork'):
+    os.mkdir('Metrics/DiggNetwork')
 
-with open('DiggNetwork/adamicAdar_DiggNetwork.pkl', 'wb') as y:
+with open('Metrics/DiggNetwork/adamicAdar_DiggNetwork.pkl', 'wb') as y:
     pickle.dump(adamicAdarList, y)
 
-with open('DiggNetwork/commonNeighbors_DiggNetwork.pkl', 'wb') as y:
+with open('Metrics/DiggNetwork/commonNeighbors_DiggNetwork.pkl', 'wb') as y:
     pickle.dump(commonNeighborsList, y)
 
-with open('DiggNetwork/rootedPageRankList_DiggNetwork.pkl', 'wb') as y:
+with open('Metrics/DiggNetwork/rootedPageRankList_DiggNetwork.pkl', 'wb') as y:
     pickle.dump(rootedPageRankList, y)
 
-with open('DiggNetwork/jaccard_DiggNetwork.pkl', 'wb') as y:
+with open('Metrics/DiggNetwork/jaccard_DiggNetwork.pkl', 'wb') as y:
     pickle.dump(jaccardList, y)
 
-with open('DiggNetwork/resAllocation_DiggNetwork.pkl', 'wb') as y:
+with open('Metrics/DiggNetwork/resAllocation_DiggNetwork.pkl', 'wb') as y:
     pickle.dump(resAllocationList, y)
 
-with open('DiggNetwork/assocStrength_DiggNetwork.pkl', 'wb') as y:
+with open('Metrics/DiggNetwork/assocStrength_DiggNetwork.pkl', 'wb') as y:
     pickle.dump(assocStrengthList, y)
     
-with open('DiggNetwork/nmeasure_DiggNetwork.pkl', 'wb') as y:
+with open('Metrics/DiggNetwork/nmeasure_DiggNetwork.pkl', 'wb') as y:
     pickle.dump(nmeasureList, y)
         
-with open('DiggNetwork/minOverlap_DiggNetwork.pkl', 'wb') as y:
+with open('Metrics/DiggNetwork/minOverlap_DiggNetwork.pkl', 'wb') as y:
     pickle.dump(minOverlapList, y)    
 
 
@@ -125,9 +114,9 @@ testPeriodDict = collections.defaultdict(list)
 for node1, node2 in testPeriodGraph.edges():
     testPeriodDict[node1].append(node2)
 
-# Creating the labels (0 or 1). If a pair for which we calculated a metric does not exist in 
-# the testing period, it takes a 0, otherwise an 1. The "labels" list will be converted to 
-# a column in the pandas data frame later, along with the calculated metrics.
+"""Creating the labels (0 or 1). If a pair for which we calculated a metric does not exist in 
+the testing period, it takes a 0, otherwise an 1. """
+    
 labels = []
 datasetPairs = []
 for u, v in jaccard_results.keys():   
